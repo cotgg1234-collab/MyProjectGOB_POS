@@ -13,7 +13,7 @@ export default function ProductImage({
   if (!src) {
     return (
       <div className={`grid place-items-center bg-surface-2 text-muted ${className}`}>
-        <span className="text-2xl font-bold opacity-40">{name.slice(0, 1)}</span>
+        <span className="text-2xl font-semibold opacity-40">{name.slice(0, 1)}</span>
       </div>
     );
   }

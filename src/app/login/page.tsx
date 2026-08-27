@@ -37,9 +37,9 @@ export default function LoginPage() {
       <div className="card w-full max-w-sm p-7">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand text-lg font-bold text-white">P</span>
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand text-lg font-semibold text-white">P</span>
             <div>
-              <div className="font-bold">{t.appName}</div>
+              <div className="font-semibold">{t.appName}</div>
               <div className="text-xs text-muted">{t.login.title}</div>
             </div>
           </div>

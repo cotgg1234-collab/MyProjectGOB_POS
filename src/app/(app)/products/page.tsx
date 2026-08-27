@@ -141,7 +141,7 @@ export default function ProductsPage() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <h1 className="mr-auto text-xl font-bold">{t.product.title}</h1>
+        <h1 className="mr-auto text-xl font-semibold">{t.product.title}</h1>
         <input
           className="input !w-64"
           placeholder={t.product.searchPlaceholder}

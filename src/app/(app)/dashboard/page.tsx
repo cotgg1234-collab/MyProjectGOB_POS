@@ -32,7 +32,7 @@ type Dash = {
   recentSales: { code: string; date: string; items: number; total: number; payMethod: string }[];
 };
 
-const PIE_COLORS = ["#1f6feb", "#16a34a", "#d97706", "#9333ea", "#dc2626", "#0891b2", "#65a30d"];
+const PIE_COLORS = ["#1e61f0", "#16a34a", "#d97706", "#9333ea", "#dc2626", "#0891b2", "#65a30d"];
 
 export default function DashboardPage() {
   const { t, lang } = useI18n();
@@ -50,7 +50,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-bold">{t.dash.title}</h1>
+      <h1 className="text-xl font-semibold">{t.dash.title}</h1>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <KpiCard
@@ -84,15 +84,15 @@ export default function DashboardPage() {
             <AreaChart data={data.trend} margin={{ left: -12, right: 8, top: 8 }}>
               <defs>
                 <linearGradient id="salesFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#1f6feb" stopOpacity={0.35} />
-                  <stop offset="100%" stopColor="#1f6feb" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#1e61f0" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="#1e61f0" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
               <XAxis dataKey="date" tickFormatter={(v: string) => v.slice(5)} fontSize={11} stroke="#94a3b8" />
               <YAxis fontSize={11} stroke="#94a3b8" tickFormatter={kFormat} />
               <Tooltip formatter={moneyTip} labelClassName="text-xs" />
-              <Area type="monotone" dataKey="sales" stroke="#1f6feb" strokeWidth={2} fill="url(#salesFill)" />
+              <Area type="monotone" dataKey="sales" stroke="#1e61f0" strokeWidth={2} fill="url(#salesFill)" />
             </AreaChart>
           </ResponsiveContainer>
         </Panel>
@@ -138,7 +138,7 @@ export default function DashboardPage() {
                 tickFormatter={(v: string) => (v.length > 16 ? `${v.slice(0, 15)}…` : v)}
               />
               <Tooltip formatter={moneyTip} />
-              <Bar dataKey="sales" fill="#1f6feb" radius={[0, 4, 4, 0]} />
+              <Bar dataKey="sales" fill="#1e61f0" radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Panel>
@@ -165,7 +165,7 @@ export default function DashboardPage() {
             <Tooltip formatter={moneyTip} />
             <Legend iconSize={8} wrapperStyle={{ fontSize: 11 }} />
             <Bar dataKey="lastYear" name={String(new Date().getFullYear() - 1)} fill="#cbd5e1" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="sales" name={String(new Date().getFullYear())} fill="#1f6feb" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="sales" name={String(new Date().getFullYear())} fill="#1e61f0" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </Panel>
@@ -232,7 +232,7 @@ function KpiCard({
       <span className={`absolute inset-y-0 left-0 w-1 ${bar}`} />
       <div className="pl-2">
         <div className="text-xs font-medium text-muted">{title}</div>
-        <div className="mt-1 text-2xl font-bold">{value}</div>
+        <div className="mt-1 text-2xl font-semibold">{value}</div>
         <div className="mt-1 flex items-center gap-2 text-xs text-muted">
           {sub}
           {delta != null && (

@@ -5,10 +5,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { useI18n } from "@/i18n/I18nProvider";
 
 const LINKS = [
-  { href: "/pos", key: "pos", icon: "🛒" },
-  { href: "/dashboard", key: "dashboard", icon: "📊" },
-  { href: "/products", key: "products", icon: "📦" },
-  { href: "/reports", key: "reports", icon: "📄" },
+  { href: "/pos", key: "pos", icon: "" },
+  { href: "/dashboard", key: "dashboard", icon: "" },
+  { href: "/products", key: "products", icon: "" },
+  { href: "/reports", key: "reports", icon: "" },
 ] as const;
 
 export default function Shell({ children }: { children: React.ReactNode }) {
@@ -26,7 +26,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen flex-col">
       <header className="no-print sticky top-0 z-30 border-b border-line bg-surface/90 backdrop-blur">
         <div className="mx-auto flex max-w-[1600px] items-center gap-4 px-4 py-3">
-          <Link href="/dashboard" className="flex items-center gap-2 font-bold text-brand">
+          <Link href="/dashboard" className="flex items-center gap-2 font-semibold text-brand">
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand text-white">P</span>
             <span className="hidden sm:inline">{t.appName}</span>
           </Link>

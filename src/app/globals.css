@@ -1,14 +1,20 @@
 @import "tailwindcss";
 
+/*
+ * Tokens sourced from DESIGN.md (Amplitude marketing system): near-monochrome
+ * canvas, cobalt #1e61f0 reserved for brand accents, an ink-pill primary CTA,
+ * a 6px/16px radius scale, and IBM Plex Sans across every tier.
+ */
 :root {
-  --background: #f4f6fb;
+  --background: #f2f4f8;
   --surface: #ffffff;
-  --surface-2: #f8fafc;
-  --border: #e2e8f0;
-  --foreground: #0f172a;
-  --muted: #64748b;
-  --brand: #1f6feb;
-  --brand-dark: #1a5ed1;
+  --surface-2: #f2f4f8;
+  --border: #d5d9e0;
+  --foreground: #171717;
+  --muted: #565656;
+  --brand: #1e61f0;
+  --brand-dark: #0052f2;
+  --ink-pill: #1a1f23;
   --success: #16a34a;
   --danger: #dc2626;
   --warning: #d97706;
@@ -23,6 +29,7 @@
   --color-muted: var(--muted);
   --color-brand: var(--brand);
   --color-brand-dark: var(--brand-dark);
+  --color-ink-pill: var(--ink-pill);
   --color-success: var(--success);
   --color-danger: var(--danger);
   --color-warning: var(--warning);
@@ -32,33 +39,33 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-thai), "Segoe UI", system-ui, sans-serif;
+  font-family: var(--font-thai), "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
 }
 
 @layer components {
   .card {
-    @apply rounded-xl border border-line bg-surface shadow-sm;
+    @apply rounded-2xl border border-line bg-surface shadow-sm;
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
-    @apply bg-brand text-white hover:bg-brand-dark;
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
+    @apply bg-ink-pill text-white hover:opacity-90;
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
     @apply border border-line bg-surface text-foreground hover:bg-surface-2;
   }
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
     @apply bg-danger text-white hover:opacity-90;
   }
   .input {
-    @apply w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20;
+    @apply w-full rounded-md border border-line bg-surface px-3 py-2 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20;
   }
   .label {
-    @apply mb-1 block text-xs font-medium text-muted;
+    @apply mb-1 block text-xs font-semibold text-muted;
   }
   .th {
     @apply px-3 py-2 text-left text-xs font-semibold text-muted uppercase tracking-wide;

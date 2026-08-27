@@ -52,10 +52,10 @@ export default function ReportsPage() {
     run();
   }, [run]);
 
-  function download(format: "xlsx" | "csv") {
+  function download() {
     // A real anchor click lets the browser handle the Content-Disposition download.
     const a = document.createElement("a");
-    a.href = `/api/reports/export?${query()}&format=${format}`;
+    a.href = `/api/reports/export?${query()}&format=xlsx`;
     a.download = "";
     document.body.appendChild(a);
     a.click();
@@ -67,11 +67,8 @@ export default function ReportsPage() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <h1 className="mr-auto text-xl font-bold">{t.report.title}</h1>
-        <button className="btn-ghost" onClick={() => download("csv")}>
-          {t.report.exportCsv}
-        </button>
-        <button className="btn-primary" onClick={() => download("xlsx")}>
+        <h1 className="mr-auto text-xl font-semibold">{t.report.title}</h1>
+        <button className="btn-primary" onClick={download}>
           {t.report.exportExcel}
         </button>
       </div>
@@ -121,9 +118,7 @@ export default function ReportsPage() {
           </>
         )}
 
-        <button className="btn-ghost" onClick={run} disabled={loading}>
-          {loading ? t.common.loading : t.report.apply}
-        </button>
+        {loading && <span className="text-xs text-muted">{t.common.loading}</span>}
       </div>
 
       {data && (
@@ -143,7 +138,7 @@ export default function ReportsPage() {
                 <XAxis dataKey="period" tickFormatter={periodLabel} fontSize={11} stroke="#94a3b8" />
                 <YAxis fontSize={11} stroke="#94a3b8" tickFormatter={kFormat} />
                 <Tooltip formatter={moneyTip} />
-                <Bar dataKey="sales" fill="#1f6feb" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="sales" fill="#1e61f0" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -249,7 +244,7 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
   return (
     <div className="card p-4">
       <div className="text-xs font-medium text-muted">{label}</div>
-      <div className={`mt-1 text-2xl font-bold ${accent ? "text-success" : ""}`}>{value}</div>
+      <div className={`mt-1 text-2xl font-semibold ${accent ? "text-success" : ""}`}>{value}</div>
     </div>
   );
 }

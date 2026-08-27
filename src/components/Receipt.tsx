@@ -20,7 +20,7 @@ export default function Receipt({ sale, onClose }: { sale: Sale; onClose: () => 
 
         <div className="print-area px-5 py-4 text-sm">
           <div className="mb-3 text-center">
-            <div className="font-bold">{t.appName}</div>
+            <div className="font-semibold">{t.appName}</div>
             <div className="text-xs text-muted">{t.pos.receipt}</div>
           </div>
 
@@ -43,7 +43,7 @@ export default function Receipt({ sale, onClose }: { sale: Sale; onClose: () => 
           <div className="space-y-0.5 py-2">
             <Line label={t.pos.subtotal} value={money(sale.subtotal)} />
             {sale.discount > 0 && <Line label={t.pos.discount} value={`-${money(sale.discount)}`} />}
-            <div className="flex justify-between border-t border-line pt-1 text-base font-bold">
+            <div className="flex justify-between border-t border-line pt-1 text-base font-semibold">
               <span>{t.pos.total}</span>
               <span>{money(sale.total)}</span>
             </div>

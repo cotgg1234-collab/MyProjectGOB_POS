@@ -175,7 +175,7 @@ export default function PosPage() {
                 <div className="p-3">
                   <div className="line-clamp-2 text-sm font-medium">{localName(lang, p.name, p.nameEn)}</div>
                   <div className="mt-1 flex items-center justify-between">
-                    <span className="font-bold text-brand">{money(p.price)}</span>
+                    <span className="font-semibold text-brand">{money(p.price)}</span>
                     <span className={`text-xs ${p.stock <= p.lowStock ? "text-danger" : "text-muted"}`}>
                       {out ? t.pos.outOfStock : `${t.pos.stock} ${p.stock}`}
                     </span>
@@ -240,7 +240,7 @@ export default function PosPage() {
 
           <div className="flex items-baseline justify-between border-t border-line pt-2">
             <span className="font-semibold">{t.pos.total}</span>
-            <span className="text-2xl font-bold text-brand">{money(total)}</span>
+            <span className="text-2xl font-semibold text-brand">{money(total)}</span>
           </div>
 
           <div>
@@ -314,7 +314,7 @@ function Row({ label, value, strong }: { label: string; value: string; strong?: 
   return (
     <div className="flex items-center justify-between">
       <span className="text-muted">{label}</span>
-      <span className={strong ? "font-bold text-success" : ""}>{value}</span>
+      <span className={strong ? "font-semibold text-success" : ""}>{value}</span>
     </div>
   );
 }

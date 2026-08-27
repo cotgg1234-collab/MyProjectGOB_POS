@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Noto_Sans_Thai } from "next/font/google";
+import { IBM_Plex_Sans_Thai } from "next/font/google";
 import { I18nProvider } from "@/i18n/I18nProvider";
 import "./globals.css";
 
-const thai = Noto_Sans_Thai({
+// Matches DESIGN.md's loaded webfont (IBM Plex Sans) with Thai glyph coverage.
+const thai = IBM_Plex_Sans_Thai({
   variable: "--font-thai",
   subsets: ["thai", "latin"],
   weight: ["400", "500", "600", "700"],
