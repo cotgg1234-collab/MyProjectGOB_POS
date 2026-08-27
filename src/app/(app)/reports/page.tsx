@@ -17,7 +17,7 @@ type Report = {
 };
 
 export default function ReportsPage() {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const now = new Date();
 
   const [preset, setPreset] = useState<Preset>("daily");
@@ -67,13 +67,13 @@ export default function ReportsPage() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <h1 className="mr-auto text-xl font-semibold">{t.report.title}</h1>
+        <h1 className="mr-auto text-2xl font-semibold">{t.report.title}</h1>
         <button className="btn-primary" onClick={download}>
           {t.report.exportExcel}
         </button>
       </div>
 
-      <div className="card flex flex-wrap items-end gap-3 p-4">
+      <div className="card flex flex-wrap items-end gap-3 p-6">
         <div>
           <span className="label">{t.report.period}</span>
           <div className="flex overflow-hidden rounded-lg border border-line">
@@ -130,7 +130,7 @@ export default function ReportsPage() {
             <Stat label={t.report.grossProfit} value={money(data.summary.profit)} accent />
           </div>
 
-          <div className="card p-4">
+          <div className="card p-6">
             <h2 className="mb-3 text-sm font-semibold">{t.report.summary}</h2>
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={data.periods} margin={{ left: -12, right: 8 }}>
@@ -219,7 +219,7 @@ export default function ReportsPage() {
                 {data.sales.slice(0, 100).map((s) => (
                   <tr key={s.code} className="border-b border-line last:border-0">
                     <td className="td font-mono text-xs">{s.code}</td>
-                    <td className="td text-muted">{new Date(s.date).toLocaleString(lang === "th" ? "th-TH" : "en-GB")}</td>
+                    <td className="td text-muted">{new Date(s.date).toLocaleString("th-TH")}</td>
                     <td className="td text-right">{s.items}</td>
                     <td className="td">{t.pos[s.payMethod as "cash" | "transfer" | "card"] ?? s.payMethod}</td>
                     <td className="td text-right text-muted">{s.discount ? money(s.discount) : "-"}</td>
@@ -242,7 +242,7 @@ export default function ReportsPage() {
 
 function Stat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className="card p-4">
+    <div className="card p-6">
       <div className="text-xs font-medium text-muted">{label}</div>
       <div className={`mt-1 text-2xl font-semibold ${accent ? "text-success" : ""}`}>{value}</div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useI18n, localName } from "@/i18n/I18nProvider";
+import { useI18n } from "@/i18n/I18nProvider";
 import { money } from "@/lib/format";
 import type { Category, Product, Sale } from "@/lib/types";
 import ProductImage from "@/components/ProductImage";
@@ -10,7 +10,7 @@ import Receipt from "@/components/Receipt";
 type CartLine = { product: Product; qty: number };
 
 export default function PosPage() {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [cat, setCat] = useState<number | null>(null);
@@ -155,7 +155,7 @@ export default function PosPage() {
                   cat === c.id ? "bg-brand text-white" : "bg-surface-2 text-muted hover:text-foreground"
                 }`}
               >
-                {localName(lang, c.name, c.nameEn)}
+                {c.name}
               </button>
             ))}
           </div>
@@ -173,7 +173,7 @@ export default function PosPage() {
               >
                 <ProductImage src={p.imageUrl} name={p.name} className="h-28 w-full" />
                 <div className="p-3">
-                  <div className="line-clamp-2 text-sm font-medium">{localName(lang, p.name, p.nameEn)}</div>
+                  <div className="line-clamp-2 text-sm font-medium">{p.name}</div>
                   <div className="mt-1 flex items-center justify-between">
                     <span className="font-semibold text-brand">{money(p.price)}</span>
                     <span className={`text-xs ${p.stock <= p.lowStock ? "text-danger" : "text-muted"}`}>
@@ -198,7 +198,7 @@ export default function PosPage() {
             <div key={l.product.id} className="mb-2 flex items-center gap-2 rounded-lg bg-surface-2 p-2">
               <ProductImage src={l.product.imageUrl} name={l.product.name} className="h-10 w-10 shrink-0 rounded" />
               <div className="min-w-0 flex-1">
-                <div className="truncate text-sm font-medium">{localName(lang, l.product.name, l.product.nameEn)}</div>
+                <div className="truncate text-sm font-medium">{l.product.name}</div>
                 <div className="text-xs text-muted">{money(l.product.price)}</div>
               </div>
               <div className="flex items-center gap-1">

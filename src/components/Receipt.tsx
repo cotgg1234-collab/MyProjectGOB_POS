@@ -5,7 +5,7 @@ import { money } from "@/lib/format";
 import type { Sale } from "@/lib/types";
 
 export default function Receipt({ sale, onClose }: { sale: Sale; onClose: () => void }) {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const when = new Date(sale.saleDate);
 
   return (
@@ -26,7 +26,7 @@ export default function Receipt({ sale, onClose }: { sale: Sale; onClose: () => 
 
           <div className="mb-2 flex justify-between text-xs text-muted">
             <span>{sale.code}</span>
-            <span>{when.toLocaleString(lang === "th" ? "th-TH" : "en-GB")}</span>
+            <span>{when.toLocaleString("th-TH")}</span>
           </div>
 
           <div className="border-y border-dashed border-line py-2">

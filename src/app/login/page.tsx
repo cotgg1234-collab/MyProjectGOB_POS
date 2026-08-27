@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useI18n } from "@/i18n/I18nProvider";
 
 export default function LoginPage() {
-  const { t, lang, setLang } = useI18n();
+  const { t } = useI18n();
   const router = useRouter();
   const [username, setUsername] = useState("admin");
   const [password, setPassword] = useState("");
@@ -35,17 +35,12 @@ export default function LoginPage() {
   return (
     <div className="grid min-h-screen place-items-center bg-gradient-to-br from-brand/10 via-background to-background px-4">
       <div className="card w-full max-w-sm p-7">
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand text-lg font-semibold text-white">P</span>
-            <div>
-              <div className="font-semibold">{t.appName}</div>
-              <div className="text-xs text-muted">{t.login.title}</div>
-            </div>
+        <div className="mb-6 flex items-center gap-2">
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand text-lg font-semibold text-white">P</span>
+          <div>
+            <div className="font-semibold">{t.appName}</div>
+            <div className="text-xs text-muted">{t.login.title}</div>
           </div>
-          <button onClick={() => setLang(lang === "th" ? "en" : "th")} className="btn-ghost !px-2 !py-1 text-xs">
-            {lang === "th" ? "EN" : "TH"}
-          </button>
         </div>
 
         <form onSubmit={submit} className="space-y-4">

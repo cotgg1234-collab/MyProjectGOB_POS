@@ -16,7 +16,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { useI18n, localName } from "@/i18n/I18nProvider";
+import { useI18n } from "@/i18n/I18nProvider";
 import { money, moneyTip, kFormat } from "@/lib/format";
 
 type Kpi = { sales: number; cost: number; profit: number; orders: number; prev?: number };
@@ -35,7 +35,7 @@ type Dash = {
 const PIE_COLORS = ["#1e61f0", "#16a34a", "#d97706", "#9333ea", "#dc2626", "#0891b2", "#65a30d"];
 
 export default function DashboardPage() {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const [data, setData] = useState<Dash | null>(null);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold">{t.dash.title}</h1>
+      <h1 className="text-2xl font-semibold">{t.dash.title}</h1>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <KpiCard
@@ -102,7 +102,7 @@ export default function DashboardPage() {
             <ResponsiveContainer width="100%" height={260}>
               <PieChart>
                 <Pie
-                  data={data.byCategory.map((c) => ({ name: localName(lang, c.name, c.nameEn), value: c.sales }))}
+                  data={data.byCategory.map((c) => ({ name: c.name, value: c.sales }))}
                   dataKey="value"
                   nameKey="name"
                   innerRadius={55}
@@ -177,7 +177,7 @@ export default function DashboardPage() {
               {data.lowStock.map((p) => (
                 <div key={p.id} className="flex items-center gap-2 rounded-lg bg-danger/5 px-3 py-2 text-sm">
                   <span className="font-mono text-xs text-muted">{p.sku}</span>
-                  <span className="flex-1 truncate">{localName(lang, p.name, p.nameEn)}</span>
+                  <span className="flex-1 truncate">{p.name}</span>
                   <span className="font-semibold text-danger">{p.stock}</span>
                 </div>
               ))}
@@ -193,7 +193,7 @@ export default function DashboardPage() {
               <div key={s.code} className="flex items-center gap-2 rounded-lg bg-surface-2 px-3 py-2 text-sm">
                 <span className="font-mono text-xs text-muted">{s.code}</span>
                 <span className="flex-1 text-xs text-muted">
-                  {new Date(s.date).toLocaleString(lang === "th" ? "th-TH" : "en-GB")}
+                  {new Date(s.date).toLocaleString("th-TH")}
                 </span>
                 <span className="text-xs text-muted">x{s.items}</span>
                 <span className="font-semibold">{money(s.total)}</span>
@@ -228,7 +228,7 @@ function KpiCard({
 }) {
   const bar = { brand: "bg-brand", success: "bg-success", warning: "bg-warning" }[accent];
   return (
-    <div className="card relative overflow-hidden p-4">
+    <div className="card relative overflow-hidden p-6">
       <span className={`absolute inset-y-0 left-0 w-1 ${bar}`} />
       <div className="pl-2">
         <div className="text-xs font-medium text-muted">{title}</div>
@@ -248,7 +248,7 @@ function KpiCard({
 
 function Panel({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <div className={`card p-4 ${className}`}>
+    <div className={`card p-6 ${className}`}>
       <h2 className="mb-3 text-sm font-semibold">{title}</h2>
       {children}
     </div>

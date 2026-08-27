@@ -12,7 +12,7 @@ const LINKS = [
 ] as const;
 
 export default function Shell({ children }: { children: React.ReactNode }) {
-  const { t, lang, setLang } = useI18n();
+  const { t } = useI18n();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -24,10 +24,10 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="no-print sticky top-0 z-30 border-b border-line bg-surface/90 backdrop-blur">
-        <div className="mx-auto flex max-w-[1600px] items-center gap-4 px-4 py-3">
+      <header className="no-print sticky top-0 z-30 h-16 border-b border-line bg-surface/90 backdrop-blur">
+        <div className="mx-auto flex h-16 max-w-[1600px] items-center gap-4 px-6">
           <Link href="/dashboard" className="flex items-center gap-2 font-semibold text-brand">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand text-white">P</span>
+            <span className="grid h-8 w-8 place-items-center rounded-md bg-brand text-white">P</span>
             <span className="hidden sm:inline">{t.appName}</span>
           </Link>
 
@@ -38,7 +38,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 <Link
                   key={l.href}
                   href={l.href}
-                  className={`rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition ${
+                  className={`rounded-md px-3 py-2 text-base font-normal whitespace-nowrap transition ${
                     active ? "bg-brand/10 text-brand" : "text-muted hover:bg-surface-2 hover:text-foreground"
                   }`}
                 >
@@ -49,22 +49,9 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          <div className="flex items-center gap-2">
-            <div className="flex overflow-hidden rounded-lg border border-line text-xs font-semibold">
-              {(["th", "en"] as const).map((l) => (
-                <button
-                  key={l}
-                  onClick={() => setLang(l)}
-                  className={`px-2.5 py-1.5 transition ${lang === l ? "bg-brand text-white" : "text-muted hover:bg-surface-2"}`}
-                >
-                  {l.toUpperCase()}
-                </button>
-              ))}
-            </div>
-            <button onClick={logout} className="btn-ghost !px-3 !py-1.5 text-xs">
-              {t.nav.logout}
-            </button>
-          </div>
+          <button onClick={logout} className="btn-ghost !px-3 !py-1.5 text-xs">
+            {t.nav.logout}
+          </button>
         </div>
       </header>
 

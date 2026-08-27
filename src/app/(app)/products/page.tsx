@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useI18n, localName } from "@/i18n/I18nProvider";
+import { useI18n } from "@/i18n/I18nProvider";
 import { money } from "@/lib/format";
 import type { Category, Product } from "@/lib/types";
 import ProductImage from "@/components/ProductImage";
@@ -11,7 +11,6 @@ type Draft = {
   id?: number;
   sku: string;
   name: string;
-  nameEn: string;
   price: string;
   cost: string;
   stock: string;
@@ -24,7 +23,6 @@ type Draft = {
 const EMPTY: Draft = {
   sku: "",
   name: "",
-  nameEn: "",
   price: "",
   cost: "",
   stock: "0",
@@ -35,7 +33,7 @@ const EMPTY: Draft = {
 };
 
 export default function ProductsPage() {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [q, setQ] = useState("");
@@ -43,7 +41,9 @@ export default function ProductsPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [showCats, setShowCats] = useState(false);
-  const [newCat, setNewCat] = useState({ name: "", nameEn: "" });
+  const [newCatName, setNewCatName] = useState("");
+  const [addingCat, setAddingCat] = useState(false);
+  const [quickCatName, setQuickCatName] = useState("");
 
   const load = useCallback(async () => {
     const [p, c] = await Promise.all([
@@ -65,7 +65,6 @@ export default function ProductsPage() {
       id: p.id,
       sku: p.sku,
       name: p.name,
-      nameEn: p.nameEn ?? "",
       price: String(p.price),
       cost: String(p.cost),
       stock: String(p.stock),
@@ -88,7 +87,6 @@ export default function ProductsPage() {
     const payload = {
       sku: draft.sku,
       name: draft.name,
-      nameEn: draft.nameEn,
       price: Number(draft.price) || 0,
       cost: Number(draft.cost) || 0,
       stock: Number(draft.stock) || 0,
@@ -121,15 +119,30 @@ export default function ProductsPage() {
     load();
   }
 
-  async function addCategory() {
-    if (!newCat.name.trim()) return;
-    await fetch("/api/categories", {
+  async function createCategory(name: string): Promise<Category | null> {
+    if (!name.trim()) return null;
+    const res = await fetch("/api/categories", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newCat),
+      body: JSON.stringify({ name }),
     });
-    setNewCat({ name: "", nameEn: "" });
+    if (!res.ok) return null;
+    return res.json();
+  }
+
+  async function addCategory() {
+    if (!(await createCategory(newCatName))) return;
+    setNewCatName("");
     load();
+  }
+
+  async function addQuickCategory() {
+    const created = await createCategory(quickCatName);
+    if (!created || !draft) return;
+    setCategories((prev) => [...prev, { ...created, _count: { products: 0 } }]);
+    setDraft({ ...draft, categoryId: String(created.id) });
+    setQuickCatName("");
+    setAddingCat(false);
   }
 
   async function removeCategory(id: number) {
@@ -141,7 +154,7 @@ export default function ProductsPage() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <h1 className="mr-auto text-xl font-semibold">{t.product.title}</h1>
+        <h1 className="mr-auto text-2xl font-semibold">{t.product.title}</h1>
         <input
           className="input !w-64"
           placeholder={t.product.searchPlaceholder}
@@ -183,9 +196,9 @@ export default function ProductsPage() {
                   <ProductImage src={p.imageUrl} name={p.name} className="h-11 w-11 rounded-lg" />
                 </td>
                 <td className="td font-mono text-xs">{p.sku}</td>
-                <td className="td font-medium">{localName(lang, p.name, p.nameEn)}</td>
+                <td className="td font-medium">{p.name}</td>
                 <td className="td text-muted">
-                  {p.category ? localName(lang, p.category.name, p.category.nameEn) : "-"}
+                  {p.category ? p.category.name : "-"}
                 </td>
                 <td className="td text-right font-semibold">{money(p.price)}</td>
                 <td className="td text-right text-muted">{money(p.cost)}</td>
@@ -225,26 +238,51 @@ export default function ProductsPage() {
                 <input className="input" value={draft.sku} onChange={(e) => setDraft({ ...draft, sku: e.target.value })} />
               </Field>
               <Field label={t.product.category}>
-                <select
-                  className="input"
-                  value={draft.categoryId}
-                  onChange={(e) => setDraft({ ...draft, categoryId: e.target.value })}
-                >
-                  <option value="">-</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {localName(lang, c.name, c.nameEn)}
-                    </option>
-                  ))}
-                </select>
+                <div className="flex gap-1">
+                  <select
+                    className="input"
+                    value={draft.categoryId}
+                    onChange={(e) => setDraft({ ...draft, categoryId: e.target.value })}
+                  >
+                    <option value="">-</option>
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    className="btn-ghost !w-10 !px-0 shrink-0"
+                    onClick={() => setAddingCat((v) => !v)}
+                    title={t.product.newCategory}
+                  >
+                    +
+                  </button>
+                </div>
               </Field>
             </div>
 
+            {addingCat && (
+              <div className="flex items-end gap-2 rounded-lg bg-surface-2 p-2">
+                <div className="flex-1">
+                  <span className="label">{t.product.newCategory}</span>
+                  <input
+                    className="input"
+                    placeholder="ชื่อหมวดหมู่"
+                    value={quickCatName}
+                    onChange={(e) => setQuickCatName(e.target.value)}
+                    autoFocus
+                  />
+                </div>
+                <button type="button" className="btn-primary !px-3" onClick={addQuickCategory}>
+                  {t.product.save}
+                </button>
+              </div>
+            )}
+
             <Field label={t.product.name}>
               <input className="input" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
-            </Field>
-            <Field label={t.product.nameEn}>
-              <input className="input" value={draft.nameEn} onChange={(e) => setDraft({ ...draft, nameEn: e.target.value })} />
             </Field>
 
             <div className="grid grid-cols-2 gap-3">
@@ -294,7 +332,7 @@ export default function ProductsPage() {
           <div className="space-y-2">
             {categories.map((c) => (
               <div key={c.id} className="flex items-center gap-2 rounded-lg bg-surface-2 px-3 py-2 text-sm">
-                <span className="flex-1">{localName(lang, c.name, c.nameEn)}</span>
+                <span className="flex-1">{c.name}</span>
                 <span className="text-xs text-muted">{c._count?.products ?? 0}</span>
                 <button className="btn-danger !px-2 !py-1 text-xs" onClick={() => removeCategory(c.id)}>
                   {t.product.delete}
@@ -302,20 +340,12 @@ export default function ProductsPage() {
               </div>
             ))}
 
-            <div className="grid grid-cols-2 gap-2 pt-2">
-              <input
-                className="input"
-                placeholder="ชื่อหมวดหมู่"
-                value={newCat.name}
-                onChange={(e) => setNewCat({ ...newCat, name: e.target.value })}
-              />
-              <input
-                className="input"
-                placeholder="Category (EN)"
-                value={newCat.nameEn}
-                onChange={(e) => setNewCat({ ...newCat, nameEn: e.target.value })}
-              />
-            </div>
+            <input
+              className="input"
+              placeholder="ชื่อหมวดหมู่"
+              value={newCatName}
+              onChange={(e) => setNewCatName(e.target.value)}
+            />
             <button className="btn-primary w-full" onClick={addCategory}>
               + {t.product.newCategory}
             </button>

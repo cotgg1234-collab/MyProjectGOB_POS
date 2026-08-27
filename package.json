@@ -8,10 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "db:push": "prisma db push",
-    "db:seed": "tsx prisma/seed.ts",
-    "db:reset": "prisma db push --force-reset && tsx prisma/seed.ts",
     "postinstall": "prisma generate",
-    "db:reset:empty": "prisma db push --force-reset && tsx prisma/seed-empty.ts"
+    "db:reset": "prisma db push --force-reset && tsx prisma/seed-empty.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
@@ -32,8 +30,5 @@
     "tailwindcss": "^4",
     "tsx": "^4.23.12",
     "typescript": "^5"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   }
 }

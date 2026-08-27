@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans_Thai } from "next/font/google";
-import { I18nProvider } from "@/i18n/I18nProvider";
 import "./globals.css";
 
 // Matches DESIGN.md's loaded webfont (IBM Plex Sans) with Thai glyph coverage.
@@ -18,9 +17,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="th" className={`${thai.variable} h-full antialiased`}>
-      <body className="min-h-full">
-        <I18nProvider>{children}</I18nProvider>
-      </body>
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }
