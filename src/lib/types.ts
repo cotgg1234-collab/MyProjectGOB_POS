@@ -18,6 +18,7 @@ export type Product = {
 export type SaleItem = {
   id: number;
   productId: number | null;
+  sku: string;
   name: string;
   qty: number;
   unitPrice: number;
@@ -35,4 +36,5 @@ export type Sale = {
   change: number;
   payMethod: string;
   items: SaleItem[];
+  user: { displayName: string } | null;
 };

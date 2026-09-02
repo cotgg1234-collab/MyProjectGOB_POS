@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -68,6 +69,7 @@ model SaleItem {
   sale      Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
   productId Int?
   product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  sku       String  @default("")
   name      String
   qty       Int
   unitPrice Float

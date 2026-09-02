@@ -29,15 +29,36 @@ export default function Receipt({ sale, onClose }: { sale: Sale; onClose: () => 
             <span>{when.toLocaleString("th-TH")}</span>
           </div>
 
+          {sale.user && (
+            <div className="mb-2 flex justify-between text-xs text-muted">
+              <span>{t.pos.cashier}</span>
+              <span>{sale.user.displayName}</span>
+            </div>
+          )}
+
           <div className="border-y border-dashed border-line py-2">
-            {sale.items.map((i) => (
-              <div key={i.id} className="flex justify-between gap-2 py-0.5">
-                <span className="min-w-0 flex-1 truncate">
-                  {i.name} <span className="text-muted">x{i.qty}</span>
-                </span>
-                <span>{money(i.lineTotal)}</span>
-              </div>
-            ))}
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-muted">
+                  <th className="pb-1 text-left font-normal">{t.pos.colSku}</th>
+                  <th className="pb-1 text-left font-normal">{t.pos.colName}</th>
+                  <th className="pb-1 text-right font-normal">{t.pos.colPrice}</th>
+                  <th className="pb-1 text-right font-normal">{t.pos.colQty}</th>
+                  <th className="pb-1 text-right font-normal">{t.pos.colTotal}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sale.items.map((i) => (
+                  <tr key={i.id}>
+                    <td className="max-w-[64px] truncate py-0.5 align-top">{i.sku || "-"}</td>
+                    <td className="py-0.5 align-top">{i.name}</td>
+                    <td className="py-0.5 text-right align-top">{money(i.unitPrice)}</td>
+                    <td className="py-0.5 text-right align-top">{i.qty}</td>
+                    <td className="py-0.5 text-right align-top font-medium">{money(i.lineTotal)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
 
           <div className="space-y-0.5 py-2">

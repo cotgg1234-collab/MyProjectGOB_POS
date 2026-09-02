@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
 import crypto from "crypto";
 import { getCurrentUser } from "@/lib/auth";
+import { supabase, PRODUCT_IMAGE_BUCKET } from "@/lib/supabase";
 
 const MAX_BYTES = 5 * 1024 * 1024;
 const ALLOWED: Record<string, string> = {
@@ -23,11 +22,17 @@ export async function POST(req: Request) {
   if (!ext) return NextResponse.json({ error: "unsupported_type" }, { status: 415 });
   if (file.size > MAX_BYTES) return NextResponse.json({ error: "file_too_large" }, { status: 413 });
 
-  const dir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(dir, { recursive: true });
-
   const filename = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}${ext}`;
-  await writeFile(path.join(dir, filename), Buffer.from(await file.arrayBuffer()));
 
-  return NextResponse.json({ url: `/uploads/${filename}` }, { status: 201 });
+  const { error } = await supabase.storage
+    .from(PRODUCT_IMAGE_BUCKET)
+    .upload(filename, Buffer.from(await file.arrayBuffer()), {
+      contentType: file.type,
+      cacheControl: "31536000",
+    });
+  if (error) return NextResponse.json({ error: "upload_failed" }, { status: 502 });
+
+  const { data } = supabase.storage.from(PRODUCT_IMAGE_BUCKET).getPublicUrl(filename);
+
+  return NextResponse.json({ url: data.publicUrl }, { status: 201 });
 }

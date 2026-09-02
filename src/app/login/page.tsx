@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useI18n } from "@/i18n/I18nProvider";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function LoginPage() {
   const { t } = useI18n();
@@ -35,12 +37,8 @@ export default function LoginPage() {
   return (
     <div className="grid min-h-screen place-items-center bg-gradient-to-br from-brand/10 via-background to-background px-4">
       <div className="card w-full max-w-sm p-7">
-        <div className="mb-6 flex items-center gap-2">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand text-lg font-semibold text-white">P</span>
-          <div>
-            <div className="font-semibold">{t.appName}</div>
-            <div className="text-xs text-muted">{t.login.title}</div>
-          </div>
+        <div className="mb-6">
+          <div className="font-semibold">{t.login.title}</div>
         </div>
 
         <form onSubmit={submit} className="space-y-4">
@@ -50,13 +48,7 @@ export default function LoginPage() {
           </div>
           <div>
             <label className="label">{t.login.password}</label>
-            <input
-              className="input"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-            />
+            <PasswordInput value={password} onChange={setPassword} placeholder="••••••••" />
           </div>
 
           {error && <p className="rounded-lg bg-danger/10 px-3 py-2 text-sm text-danger">{error}</p>}
@@ -66,7 +58,12 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="mt-4 rounded-lg bg-surface-2 px-3 py-2 text-center text-xs text-muted">{t.login.hint}</p>
+        <p className="mt-4 text-center text-sm text-muted">
+          {t.login.noAccount}{" "}
+          <Link href="/register" className="font-semibold text-brand hover:underline">
+            {t.login.registerLink}
+          </Link>
+        </p>
       </div>
     </div>
   );

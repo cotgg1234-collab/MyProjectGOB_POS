@@ -26,11 +26,6 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen flex-col">
       <header className="no-print sticky top-0 z-30 h-16 border-b border-line bg-surface/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-[1600px] items-center gap-4 px-6">
-          <Link href="/dashboard" className="flex items-center gap-2 font-semibold text-brand">
-            <span className="grid h-8 w-8 place-items-center rounded-md bg-brand text-white">P</span>
-            <span className="hidden sm:inline">{t.appName}</span>
-          </Link>
-
           <nav className="flex flex-1 items-center gap-1 overflow-x-auto">
             {LINKS.map((l) => {
               const active = pathname.startsWith(l.href);

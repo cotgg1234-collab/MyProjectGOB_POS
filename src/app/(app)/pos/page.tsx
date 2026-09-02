@@ -18,7 +18,6 @@ export default function PosPage() {
   const [cart, setCart] = useState<CartLine[]>([]);
   const [discount, setDiscount] = useState(0);
   const [received, setReceived] = useState("");
-  const [payMethod, setPayMethod] = useState<"cash" | "transfer" | "card">("cash");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [lastSale, setLastSale] = useState<Sale | null>(null);
@@ -53,7 +52,7 @@ export default function PosPage() {
 
   const subtotal = cart.reduce((s, l) => s + l.product.price * l.qty, 0);
   const total = Math.max(0, subtotal - discount);
-  const change = payMethod === "cash" ? Math.max(0, (Number(received) || 0) - total) : 0;
+  const change = Math.max(0, (Number(received) || 0) - total);
 
   function add(p: Product) {
     setError("");
@@ -96,7 +95,7 @@ export default function PosPage() {
 
   async function checkout() {
     if (!cart.length) return;
-    if (payMethod === "cash" && (Number(received) || 0) < total) {
+    if ((Number(received) || 0) < total) {
       setError(t.pos.notEnoughMoney);
       return;
     }
@@ -109,8 +108,7 @@ export default function PosPage() {
       body: JSON.stringify({
         items: cart.map((l) => ({ productId: l.product.id, qty: l.qty })),
         discount,
-        payMethod,
-        received: payMethod === "cash" ? Number(received) || total : total,
+        received: Number(received) || total,
       }),
     });
     setBusy(false);
@@ -243,54 +241,33 @@ export default function PosPage() {
             <span className="text-2xl font-semibold text-brand">{money(total)}</span>
           </div>
 
-          <div>
-            <span className="label">{t.pos.payMethod}</span>
-            <div className="grid grid-cols-3 gap-1">
-              {(["cash", "transfer", "card"] as const).map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setPayMethod(m)}
-                  className={`rounded-lg py-1.5 text-xs font-medium transition ${
-                    payMethod === m ? "bg-brand text-white" : "bg-surface-2 text-muted hover:text-foreground"
-                  }`}
-                >
-                  {t.pos[m]}
-                </button>
-              ))}
-            </div>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-muted">{t.pos.received}</span>
+            <input
+              className="input !w-32 !py-1 text-right"
+              value={received}
+              placeholder="0"
+              onChange={(e) => setReceived(e.target.value)}
+            />
           </div>
-
-          {payMethod === "cash" && (
-            <>
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-muted">{t.pos.received}</span>
-                <input
-                  className="input !w-32 !py-1 text-right"
-                  value={received}
-                  placeholder="0"
-                  onChange={(e) => setReceived(e.target.value)}
-                />
-              </div>
-              <div className="flex flex-wrap justify-end gap-1">
-                {[20, 50, 100, 500, 1000].map((n) => (
-                  <button
-                    key={n}
-                    onClick={() => setReceived(String((Number(received) || 0) + n))}
-                    className="rounded bg-surface-2 px-2 py-1 text-xs hover:bg-line"
-                  >
-                    +{n}
-                  </button>
-                ))}
-                <button
-                  onClick={() => setReceived(String(total))}
-                  className="rounded bg-surface-2 px-2 py-1 text-xs hover:bg-line"
-                >
-                  =
-                </button>
-              </div>
-              <Row label={t.pos.change} value={money(change)} strong />
-            </>
-          )}
+          <div className="flex flex-wrap justify-end gap-1">
+            {[1, 2, 5, 10, 20, 50, 100, 500, 1000].map((n) => (
+              <button
+                key={n}
+                onClick={() => setReceived(String((Number(received) || 0) + n))}
+                className="rounded bg-surface-2 px-2 py-1 text-xs hover:bg-line"
+              >
+                +{n}
+              </button>
+            ))}
+            <button
+              onClick={() => setReceived(String(total))}
+              className="rounded bg-surface-2 px-2 py-1 text-xs hover:bg-line"
+            >
+              =
+            </button>
+          </div>
+          <Row label={t.pos.change} value={money(change)} strong />
 
           {error && <p className="rounded-lg bg-danger/10 px-3 py-2 text-xs text-danger">{error}</p>}
 

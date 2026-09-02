@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   const sales = await prisma.sale.findMany({
     orderBy: { saleDate: "desc" },
     take,
-    include: { items: true },
+    include: { items: true, user: { select: { displayName: true } } },
   });
   return NextResponse.json(sales);
 }
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     where: { id: { in: incoming.map((i) => Number(i.productId)) } },
   });
 
-  const items: { productId: number; name: string; qty: number; unitPrice: number; unitCost: number; lineTotal: number }[] = [];
+  const items: { productId: number; sku: string; name: string; qty: number; unitPrice: number; unitCost: number; lineTotal: number }[] = [];
   for (const line of incoming) {
     const p = products.find((x) => x.id === Number(line.productId));
     const qty = Math.floor(Number(line.qty));
@@ -39,6 +39,7 @@ export async function POST(req: Request) {
     }
     items.push({
       productId: p.id,
+      sku: p.sku,
       name: p.name,
       qty,
       unitPrice: p.price,
@@ -51,8 +52,8 @@ export async function POST(req: Request) {
   const discount = Math.max(0, Math.min(Number(body.discount) || 0, subtotal));
   const total = subtotal - discount;
   const cost = items.reduce((s, i) => s + i.unitCost * i.qty, 0);
-  const payMethod = ["cash", "transfer", "card"].includes(body.payMethod) ? body.payMethod : "cash";
-  const received = payMethod === "cash" ? Number(body.received) || total : total;
+  const payMethod = "cash";
+  const received = Number(body.received) || total;
   if (received < total) return NextResponse.json({ error: "insufficient_payment" }, { status: 400 });
 
   const now = new Date();
@@ -81,7 +82,7 @@ export async function POST(req: Request) {
         userId: user.id,
         items: { create: items },
       },
-      include: { items: true },
+      include: { items: true, user: { select: { displayName: true } } },
     });
 
     for (const item of items) {

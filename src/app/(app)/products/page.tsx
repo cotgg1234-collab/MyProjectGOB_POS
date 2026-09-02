@@ -20,6 +20,19 @@ type Draft = {
   active: boolean;
 };
 
+/** Strips everything but digits and a single decimal point — blocks letters and "-". */
+function sanitizeDecimal(v: string) {
+  const cleaned = v.replace(/[^0-9.]/g, "");
+  const firstDot = cleaned.indexOf(".");
+  if (firstDot === -1) return cleaned;
+  return cleaned.slice(0, firstDot + 1) + cleaned.slice(firstDot + 1).replace(/\./g, "");
+}
+
+/** Strips everything but digits — blocks letters, "-", and ".". */
+function sanitizeInt(v: string) {
+  return v.replace(/[^0-9]/g, "");
+}
+
 const EMPTY: Draft = {
   sku: "",
   name: "",
@@ -287,19 +300,35 @@ export default function ProductsPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <Field label={t.product.price}>
-                <input className="input" value={draft.price} onChange={(e) => setDraft({ ...draft, price: e.target.value })} />
+                <input
+                  className="input"
+                  inputMode="decimal"
+                  value={draft.price}
+                  onChange={(e) => setDraft({ ...draft, price: sanitizeDecimal(e.target.value) })}
+                />
               </Field>
               <Field label={t.product.cost}>
-                <input className="input" value={draft.cost} onChange={(e) => setDraft({ ...draft, cost: e.target.value })} />
+                <input
+                  className="input"
+                  inputMode="decimal"
+                  value={draft.cost}
+                  onChange={(e) => setDraft({ ...draft, cost: sanitizeDecimal(e.target.value) })}
+                />
               </Field>
               <Field label={t.product.stock}>
-                <input className="input" value={draft.stock} onChange={(e) => setDraft({ ...draft, stock: e.target.value })} />
+                <input
+                  className="input"
+                  inputMode="numeric"
+                  value={draft.stock}
+                  onChange={(e) => setDraft({ ...draft, stock: sanitizeInt(e.target.value) })}
+                />
               </Field>
               <Field label={t.product.lowStock}>
                 <input
                   className="input"
+                  inputMode="numeric"
                   value={draft.lowStock}
-                  onChange={(e) => setDraft({ ...draft, lowStock: e.target.value })}
+                  onChange={(e) => setDraft({ ...draft, lowStock: sanitizeInt(e.target.value) })}
                 />
               </Field>
             </div>
