@@ -67,8 +67,16 @@ export default function ReportsPage() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <h1 className="mr-auto text-2xl font-semibold">{t.report.title}</h1>
-        <button className="btn-primary" onClick={download}>
+        <div className="mr-auto">
+          <h1 className="text-2xl font-semibold">{t.report.title}</h1>
+          <div className="mt-0.5 text-sm text-muted">{t.report.subtitle}</div>
+        </div>
+        <button className="btn-primary h-[44px] gap-2" onClick={download}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 3v12" />
+            <path d="m7 10 5 5 5-5" />
+            <path d="M5 21h14" />
+          </svg>
           {t.report.exportExcel}
         </button>
       </div>
@@ -244,7 +252,7 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
   return (
     <div className="card p-6">
       <div className="text-xs font-medium text-muted">{label}</div>
-      <div className={`mt-1 text-2xl font-semibold ${accent ? "text-success" : ""}`}>{value}</div>
+      <div className={`mt-1 text-[26px] font-extrabold ${accent ? "text-success" : ""}`}>{value}</div>
     </div>
   );
 }

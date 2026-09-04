@@ -47,9 +47,9 @@ function periodKey(d: Date, g: Granularity) {
   return iso;
 }
 
-export async function buildReport(from: Date, to: Date, granularity: Granularity): Promise<ReportData> {
+export async function buildReport(from: Date, to: Date, granularity: Granularity, ownerId: number): Promise<ReportData> {
   const sales = await prisma.sale.findMany({
-    where: { saleDate: { gte: from, lte: to } },
+    where: { ownerId, saleDate: { gte: from, lte: to } },
     include: { items: true },
     orderBy: { saleDate: "asc" },
   });
@@ -102,7 +102,7 @@ export async function buildReport(from: Date, to: Date, granularity: Granularity
   // Fill in SKUs for products that still exist.
   const ids = [...products.keys()].map(Number).filter(Number.isInteger);
   if (ids.length) {
-    const found = await prisma.product.findMany({ where: { id: { in: ids } }, select: { id: true, sku: true } });
+    const found = await prisma.product.findMany({ where: { id: { in: ids }, ownerId }, select: { id: true, sku: true } });
     for (const f of found) {
       const p = products.get(String(f.id));
       if (p) p.sku = f.sku;

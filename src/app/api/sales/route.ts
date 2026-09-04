@@ -5,10 +5,14 @@ import { getCurrentUser } from "@/lib/auth";
 type IncomingItem = { productId: number; qty: number };
 
 export async function GET(req: Request) {
+  const user = await getCurrentUser();
+  if (!user?.shopOwnerId) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
   const { searchParams } = new URL(req.url);
   const take = Math.min(Number(searchParams.get("take") ?? 20), 100);
 
   const sales = await prisma.sale.findMany({
+    where: { ownerId: user.shopOwnerId },
     orderBy: { saleDate: "desc" },
     take,
     include: { items: true, user: { select: { displayName: true } } },
@@ -18,14 +22,14 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!user?.shopOwnerId) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const body = await req.json();
   const incoming: IncomingItem[] = Array.isArray(body.items) ? body.items : [];
   if (!incoming.length) return NextResponse.json({ error: "empty_cart" }, { status: 400 });
 
   const products = await prisma.product.findMany({
-    where: { id: { in: incoming.map((i) => Number(i.productId)) } },
+    where: { id: { in: incoming.map((i) => Number(i.productId)) }, ownerId: user.shopOwnerId },
   });
 
   const items: { productId: number; sku: string; name: string; qty: number; unitPrice: number; unitCost: number; lineTotal: number }[] = [];
@@ -59,7 +63,7 @@ export async function POST(req: Request) {
   const now = new Date();
   const stamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
   const lastToday = await prisma.sale.findFirst({
-    where: { code: { startsWith: `S${stamp}-` } },
+    where: { ownerId: user.shopOwnerId, code: { startsWith: `S${stamp}-` } },
     orderBy: { code: "desc" },
     select: { code: true },
   });
@@ -69,6 +73,7 @@ export async function POST(req: Request) {
   const sale = await prisma.$transaction(async (tx) => {
     const created = await tx.sale.create({
       data: {
+        ownerId: user.shopOwnerId!,
         code: `S${stamp}-${String(nextSeq).padStart(5, "0")}`,
         saleDate: now,
         subtotal,

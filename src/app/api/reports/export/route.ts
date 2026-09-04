@@ -1,7 +1,9 @@
+import { NextResponse } from "next/server";
 import ExcelJS from "exceljs";
 import { buildReport, type ReportData } from "@/lib/report";
 import { resolveRange, type Preset } from "@/lib/range";
 import { ymd } from "@/lib/format";
+import { getCurrentUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -114,6 +116,9 @@ async function toXlsx(data: ReportData) {
 }
 
 export async function GET(req: Request) {
+  const user = await getCurrentUser();
+  if (!user?.shopOwnerId) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
   const { searchParams } = new URL(req.url);
   const preset = (searchParams.get("preset") ?? "daily") as Preset;
   const format = searchParams.get("format") === "csv" ? "csv" : "xlsx";
@@ -124,7 +129,7 @@ export async function GET(req: Request) {
     searchParams.get("to") ?? undefined,
   );
 
-  const data = await buildReport(from, to, granularity);
+  const data = await buildReport(from, to, granularity, user.shopOwnerId);
   const filename = `sales-${preset}-${ymd(from)}_${ymd(to)}.${format}`;
 
   if (format === "csv") {

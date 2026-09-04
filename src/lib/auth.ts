@@ -25,6 +25,10 @@ function sign(value: string) {
   return crypto.createHmac("sha256", secret()).update(value).digest("hex");
 }
 
+export function generateShopCode() {
+  return crypto.randomBytes(5).toString("hex").toUpperCase().slice(0, 8);
+}
+
 export function makeToken(userId: number) {
   const payload = `${userId}.${Date.now()}`;
   return `${payload}.${sign(payload)}`;
@@ -47,10 +51,27 @@ export async function getCurrentUser() {
   if (!token) return null;
   const id = readToken(token);
   if (!id) return null;
-  return prisma.user.findUnique({
-    select: { id: true, username: true, displayName: true },
+  const user = await prisma.user.findUnique({
+    select: {
+      id: true,
+      username: true,
+      displayName: true,
+      role: true,
+      shopName: true,
+      shopCode: true,
+      ownerId: true,
+      owner: { select: { shopName: true } },
+    },
     where: { id },
   });
+  if (!user) return null;
+
+  const shopOwnerId = user.role === "owner" ? user.id : (user.ownerId ?? null);
+  const shopName = user.role === "owner" ? user.shopName : (user.owner?.shopName ?? null);
+  // Only the owner sees the shop's join code — staff never need it once they've joined.
+  const shopCode = user.role === "owner" ? user.shopCode : null;
+
+  return { ...user, shopOwnerId, shopName, shopCode };
 }
 
 export const SESSION_COOKIE = COOKIE;

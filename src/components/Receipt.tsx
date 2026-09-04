@@ -3,9 +3,11 @@
 import { useI18n } from "@/i18n/I18nProvider";
 import { money } from "@/lib/format";
 import type { Sale } from "@/lib/types";
+import { useShop } from "@/components/Shell";
 
 export default function Receipt({ sale, onClose }: { sale: Sale; onClose: () => void }) {
   const { t } = useI18n();
+  const shop = useShop();
   const when = new Date(sale.saleDate);
 
   return (
@@ -20,7 +22,7 @@ export default function Receipt({ sale, onClose }: { sale: Sale; onClose: () => 
 
         <div className="print-area px-5 py-4 text-sm">
           <div className="mb-3 text-center">
-            <div className="font-semibold">{t.appName}</div>
+            <div className="font-semibold">{shop?.shopName ?? t.appName}</div>
             <div className="text-xs text-muted">{t.pos.receipt}</div>
           </div>
 

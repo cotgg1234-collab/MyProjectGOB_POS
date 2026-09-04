@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getCurrentUser } from "@/lib/auth";
 import { addDays, endOfDay, startOfDay, ymd } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const user = await getCurrentUser();
+  if (!user?.shopOwnerId) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const ownerId = user.shopOwnerId;
+
   const now = new Date();
   const todayStart = startOfDay(now);
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -13,22 +18,22 @@ export async function GET() {
 
   const [yearSales, lowStock, categories] = await Promise.all([
     prisma.sale.findMany({
-      where: { saleDate: { gte: new Date(now.getFullYear() - 1, 0, 1) } },
+      where: { ownerId, saleDate: { gte: new Date(now.getFullYear() - 1, 0, 1) } },
       include: { items: true },
       orderBy: { saleDate: "asc" },
     }),
     prisma.product.findMany({
-      where: { active: true },
+      where: { ownerId, active: true },
       select: { id: true, sku: true, name: true, nameEn: true, stock: true, lowStock: true },
       orderBy: { stock: "asc" },
       take: 50,
     }),
-    prisma.category.findMany({ select: { id: true, name: true, nameEn: true } }),
+    prisma.category.findMany({ where: { ownerId }, select: { id: true, name: true, nameEn: true } }),
   ]);
 
   const productIds = [...new Set(yearSales.flatMap((s) => s.items.map((i) => i.productId).filter(Boolean)))] as number[];
   const products = await prisma.product.findMany({
-    where: { id: { in: productIds } },
+    where: { id: { in: productIds }, ownerId },
     select: { id: true, sku: true, name: true, nameEn: true, categoryId: true },
   });
   const productById = new Map(products.map((p) => [p.id, p]));

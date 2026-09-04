@@ -50,7 +50,10 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">{t.dash.title}</h1>
+      <div>
+        <h1 className="text-2xl font-semibold">{t.dash.title}</h1>
+        <div className="mt-0.5 text-sm text-muted">{t.dash.subtitle}</div>
+      </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <KpiCard
@@ -232,7 +235,7 @@ function KpiCard({
       <span className={`absolute inset-y-0 left-0 w-1 ${bar}`} />
       <div className="pl-2">
         <div className="text-xs font-medium text-muted">{title}</div>
-        <div className="mt-1 text-2xl font-semibold">{value}</div>
+        <div className="mt-1 text-[26px] font-extrabold">{value}</div>
         <div className="mt-1 flex items-center gap-2 text-xs text-muted">
           {sub}
           {delta != null && (

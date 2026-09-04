@@ -8,7 +8,11 @@ function hashPassword(password: string) {
   return `${salt}:${crypto.scryptSync(password, salt, 32).toString("hex")}`;
 }
 
-/** Clears all data and leaves only the default admin account — no demo products or sales. */
+function genShopCode() {
+  return crypto.randomBytes(5).toString("hex").toUpperCase().slice(0, 8);
+}
+
+/** Clears all data and leaves only a default owner account (its own shop) — no demo products or sales. */
 async function main() {
   await prisma.saleItem.deleteMany();
   await prisma.sale.deleteMany();
@@ -16,11 +20,19 @@ async function main() {
   await prisma.category.deleteMany();
   await prisma.user.deleteMany();
 
+  const shopCode = genShopCode();
   await prisma.user.create({
-    data: { username: "admin", passwordHash: hashPassword("admin123"), displayName: "ผู้ดูแลระบบ" },
+    data: {
+      username: "admin",
+      passwordHash: hashPassword("admin123"),
+      displayName: "ผู้ดูแลระบบ",
+      role: "owner",
+      shopName: "ร้านค้าเริ่มต้น",
+      shopCode,
+    },
   });
 
-  console.log("Database reset: empty, only the admin account remains (admin / admin123).");
+  console.log(`Database reset: empty, only the owner account remains (admin / admin123, shop code ${shopCode}).`);
 }
 
 main()

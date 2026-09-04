@@ -6,6 +6,7 @@ import { money } from "@/lib/format";
 import type { Category, Product } from "@/lib/types";
 import ProductImage from "@/components/ProductImage";
 import ImageUploader from "@/components/ImageUploader";
+import { useShop } from "@/components/Shell";
 
 type Draft = {
   id?: number;
@@ -47,6 +48,8 @@ const EMPTY: Draft = {
 
 export default function ProductsPage() {
   const { t } = useI18n();
+  const shop = useShop();
+  const isOwner = shop?.role === "owner";
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [q, setQ] = useState("");
@@ -167,25 +170,61 @@ export default function ProductsPage() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <h1 className="mr-auto text-2xl font-semibold">{t.product.title}</h1>
-        <input
-          className="input !w-64"
-          placeholder={t.product.searchPlaceholder}
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-        />
-        <button className="btn-ghost" onClick={() => setShowCats(true)}>
-          {t.product.manageCategories}
-        </button>
-        <button
-          className="btn-primary"
-          onClick={() => {
-            setError("");
-            setDraft({ ...EMPTY });
-          }}
-        >
-          + {t.product.add}
-        </button>
+        <div className="mr-auto">
+          <h1 className="text-2xl font-semibold">{t.product.title}</h1>
+          <div className="mt-0.5 text-sm text-muted">
+            {t.product.totalPrefix} {products.length} {t.product.totalSuffix}
+          </div>
+        </div>
+        <div className="relative">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="pointer-events-none absolute inset-y-0 left-3.5 my-auto text-muted"
+          >
+            <circle cx="11" cy="11" r="7" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          <input
+            className="input h-[42px] !w-64 pl-10"
+            placeholder={t.product.searchPlaceholder}
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
+        </div>
+        {isOwner && (
+          <>
+            <button className="btn-ghost h-[42px]" onClick={() => setShowCats(true)}>
+              {t.product.manageCategories}
+            </button>
+            <button
+              className="btn-primary h-[42px] gap-1.5"
+              onClick={() => {
+                setError("");
+                setDraft({ ...EMPTY });
+              }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              {t.product.add}
+            </button>
+          </>
+        )}
+      </div>
+
+      <div className="flex items-start gap-2.5 rounded-xl border border-brand/20 bg-brand/[0.07] px-3.5 py-2.5">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" strokeWidth="2" className="mt-0.5 shrink-0">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 11v5M12 8h.01" />
+        </svg>
+        <span className="flex-1 text-xs leading-relaxed text-brand-dark">{t.product.tip}</span>
       </div>
 
       <div className="card overflow-x-auto">
@@ -198,8 +237,8 @@ export default function ProductsPage() {
               <th className="th">{t.product.category}</th>
               <th className="th text-right">{t.product.price}</th>
               <th className="th text-right">{t.product.cost}</th>
-              <th className="th text-right">{t.product.stock}</th>
-              <th className="th"></th>
+              <th className="th text-center">{t.product.stock}</th>
+              {isOwner && <th className="th"></th>}
             </tr>
           </thead>
           <tbody>
@@ -210,29 +249,58 @@ export default function ProductsPage() {
                 </td>
                 <td className="td font-mono text-xs">{p.sku}</td>
                 <td className="td font-medium">{p.name}</td>
-                <td className="td text-muted">
-                  {p.category ? p.category.name : "-"}
+                <td className="td">
+                  {p.category ? (
+                    <span className="rounded-full bg-surface-2 px-2.5 py-1 text-xs font-semibold text-muted">
+                      {p.category.name}
+                    </span>
+                  ) : (
+                    <span className="text-muted">-</span>
+                  )}
                 </td>
                 <td className="td text-right font-semibold">{money(p.price)}</td>
                 <td className="td text-right text-muted">{money(p.cost)}</td>
-                <td className={`td text-right font-semibold ${p.stock <= p.lowStock ? "text-danger" : ""}`}>
-                  {p.stock}
+                <td className="td text-center">
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-bold ${
+                      p.stock <= p.lowStock ? "bg-danger/10 text-danger" : "bg-success/10 text-success"
+                    }`}
+                  >
+                    {p.stock}
+                  </span>
                 </td>
-                <td className="td">
-                  <div className="flex justify-end gap-1">
-                    <button className="btn-ghost !px-2 !py-1 text-xs" onClick={() => edit(p)}>
-                      {t.product.edit}
-                    </button>
-                    <button className="btn-danger !px-2 !py-1 text-xs" onClick={() => remove(p)}>
-                      {t.product.delete}
-                    </button>
-                  </div>
-                </td>
+                {isOwner && (
+                  <td className="td">
+                    <div className="flex justify-end gap-1.5">
+                      <button
+                        title={t.product.edit}
+                        onClick={() => edit(p)}
+                        className="grid h-[34px] w-[34px] place-items-center rounded-[9px] border border-line bg-surface text-muted transition hover:text-foreground"
+                      >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 20h9" />
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                        </svg>
+                      </button>
+                      <button
+                        title={t.product.delete}
+                        onClick={() => remove(p)}
+                        className="grid h-[34px] w-[34px] place-items-center rounded-[9px] border border-line bg-surface text-danger transition hover:bg-danger/5"
+                      >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M4 7h16" />
+                          <path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" />
+                          <path d="M9 7V4h6v3" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
             {!products.length && (
               <tr>
-                <td className="td py-10 text-center text-muted" colSpan={8}>
+                <td className="td py-10 text-center text-muted" colSpan={isOwner ? 8 : 7}>
                   {t.product.noProducts}
                 </td>
               </tr>
@@ -241,7 +309,7 @@ export default function ProductsPage() {
         </table>
       </div>
 
-      {draft && (
+      {isOwner && draft && (
         <Modal title={draft.id ? t.product.edit : t.product.add} onClose={() => setDraft(null)}>
           <div className="space-y-3">
             <ImageUploader value={draft.imageUrl} onChange={(url) => setDraft({ ...draft, imageUrl: url })} />
@@ -356,7 +424,7 @@ export default function ProductsPage() {
         </Modal>
       )}
 
-      {showCats && (
+      {isOwner && showCats && (
         <Modal title={t.product.manageCategories} onClose={() => setShowCats(false)}>
           <div className="space-y-2">
             {categories.map((c) => (

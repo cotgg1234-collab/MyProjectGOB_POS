@@ -7,18 +7,38 @@ export default function PasswordInput({
   onChange,
   placeholder,
   autoFocus,
+  withIcon,
+  className = "",
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
   autoFocus?: boolean;
+  withIcon?: boolean;
+  className?: string;
 }) {
   const [show, setShow] = useState(false);
 
   return (
     <div className="relative">
+      {withIcon && (
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="pointer-events-none absolute inset-y-0 left-3.5 my-auto text-muted"
+        >
+          <rect x="5" y="11" width="14" height="9" rx="2" />
+          <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+        </svg>
+      )}
       <input
-        className="input pr-10"
+        className={`input pr-10 ${withIcon ? "pl-10" : ""} ${className}`}
         type={show ? "text" : "password"}
         value={value}
         onChange={(e) => onChange(e.target.value)}

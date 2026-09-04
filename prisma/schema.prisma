@@ -13,20 +13,37 @@ model User {
   username     String   @unique
   passwordHash String
   displayName  String
+  role         String   @default("user")
+  shopName     String?  @unique
+  shopCode     String?  @unique
+  ownerId      Int?
+  owner        User?    @relation("ShopMembers", fields: [ownerId], references: [id], onDelete: SetNull)
+  staff        User[]   @relation("ShopMembers")
   createdAt    DateTime @default(now())
   sales        Sale[]
+  categories   Category[]
+  products     Product[]
+  shopSales    Sale[]     @relation("ShopSales")
+
+  @@index([ownerId])
 }
 
 model Category {
   id       Int       @id @default(autoincrement())
-  name     String    @unique
+  ownerId  Int
+  owner    User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name     String
   nameEn   String?
   products Product[]
+
+  @@unique([ownerId, name])
 }
 
 model Product {
   id         Int        @id @default(autoincrement())
-  sku        String     @unique
+  ownerId    Int
+  owner      User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  sku        String
   name       String
   nameEn     String?
   price      Float
@@ -41,12 +58,15 @@ model Product {
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 
+  @@unique([ownerId, sku])
   @@index([categoryId])
 }
 
 model Sale {
   id        Int        @id @default(autoincrement())
-  code      String     @unique
+  ownerId   Int
+  shop      User       @relation("ShopSales", fields: [ownerId], references: [id], onDelete: Cascade)
+  code      String
   saleDate  DateTime   @default(now())
   subtotal  Float
   discount  Float      @default(0)
@@ -60,6 +80,7 @@ model Sale {
   user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
   items     SaleItem[]
 
+  @@unique([ownerId, code])
   @@index([saleDate])
 }
 

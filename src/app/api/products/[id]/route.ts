@@ -5,14 +5,27 @@ import { getCurrentUser } from "@/lib/auth";
 type Params = { params: Promise<{ id: string }> };
 
 export async function PUT(req: Request, { params }: Params) {
-  if (!(await getCurrentUser())) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const user = await getCurrentUser();
+  if (!user?.shopOwnerId) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (user.role !== "owner") return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
   const id = Number((await params).id);
+  const existing = await prisma.product.findFirst({ where: { id, ownerId: user.shopOwnerId } });
+  if (!existing) return NextResponse.json({ error: "not_found" }, { status: 404 });
+
   const body = await req.json();
 
   if (body.sku) {
-    const clash = await prisma.product.findFirst({ where: { sku: String(body.sku).trim(), NOT: { id } } });
+    const clash = await prisma.product.findFirst({
+      where: { sku: String(body.sku).trim(), ownerId: user.shopOwnerId, NOT: { id } },
+    });
     if (clash) return NextResponse.json({ error: "duplicate_sku" }, { status: 409 });
+  }
+  if (body.categoryId) {
+    const category = await prisma.category.findFirst({
+      where: { id: Number(body.categoryId), ownerId: user.shopOwnerId },
+    });
+    if (!category) return NextResponse.json({ error: "category_not_found" }, { status: 400 });
   }
 
   const product = await prisma.product.update({
@@ -35,9 +48,14 @@ export async function PUT(req: Request, { params }: Params) {
 }
 
 export async function DELETE(_req: Request, { params }: Params) {
-  if (!(await getCurrentUser())) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const user = await getCurrentUser();
+  if (!user?.shopOwnerId) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (user.role !== "owner") return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
   const id = Number((await params).id);
+  const existing = await prisma.product.findFirst({ where: { id, ownerId: user.shopOwnerId } });
+  if (!existing) return NextResponse.json({ error: "not_found" }, { status: 404 });
+
   const sold = await prisma.saleItem.count({ where: { productId: id } });
 
   // Keep sales history intact: products that have been sold are archived, not deleted.
